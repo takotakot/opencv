@@ -147,11 +147,12 @@ float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
 RotatedRect::RotatedRect(const Point2f& _point1, const Point2f& _point2, const Point2f& _point3)
 {
     Point2f _center = 0.5f * (_point1 + _point3);
-    Vec2f vecs[2];
+    Vec2f vecs[3];
     vecs[0] = Vec2f(_point1 - _point2);
     vecs[1] = Vec2f(_point2 - _point3);
+    vecs[2] = Vec2f(_point3 - _point1);
     // check that given sides are perpendicular
-    CV_Assert( abs(vecs[0].dot(vecs[1])) / (norm(vecs[0]) * norm(vecs[1])) <= FLT_EPSILON );
+    CV_Assert( (std::fabs(vecs[0].ddot(vecs[1])) <= FLT_EPSILON * (norm(vecs[0]) * norm(vecs[1]))) || (std::fabs(vecs[0].ddot(vecs[0]) + vecs[1].ddot(vecs[1]) - vecs[2].ddot(vecs[2])) <= FLT_EPSILON * vecs[2].ddot(vecs[2])));
 
     // wd_i stores which vector (0,1) or (1,2) will make the width
     // One of them will definitely have slope within -1 to 1
